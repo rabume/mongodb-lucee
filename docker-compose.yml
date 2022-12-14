@@ -1,0 +1,44 @@
+version: "3"
+services:
+  cfml:
+    container_name: cfml-mongo-test
+    image: ortussolutions/commandbox
+    restart: always
+    environment:
+      PORT: 3000
+      LUCEE_EXTENSIONS: E6634E1A-4CC5-4839-A83C67549ECA8D5B;version=3.12.8.132
+      BOX_SERVER_APP_CFENGINE: lucee@5.3
+    volumes:
+      - "./:/app"
+    ports:
+      - 127.0.0.1:3000:3000
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      interval: 1m30s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+
+  mongo:
+    container_name: mongo-test
+    image: mongo
+    restart: always
+    ports:
+      - "127.0.0.1:27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=defaultpass
+    volumes:
+      - mongo:/data/db
+    networks:
+      - backend
+
+volumes:
+  mongo:
+
+
+networks:
+  backend:
+    driver: bridge
